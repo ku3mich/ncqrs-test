@@ -1,0 +1,15 @@
+﻿-
+    function url(u){
+        if (!u)
+            return;
+        if (u.startsWith('~/'))
+            return u.replace(/\~/, ViewData.webRoot);
+        return u
+    }
+
+mixin css(u)
+    link(rel="stylesheet" type="text/css" href=url(u))
+    
+mixin js(u)
+    script(type="text/javascript" src=url(u))
+

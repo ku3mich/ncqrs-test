@@ -1,28 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Mvc;
-using pugzor.core;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Configuration;
+using Pugzor.Core.Extensions;
 using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace NCQRSTest
 {
+
     public class Startup
     {
         public IConfigurationRoot Configuration { get; set; }
+        public IHostingEnvironment Environment { get; set; }
 
         public Startup(IHostingEnvironment environment)
         {
+            Environment = environment;
+
             var builder = new ConfigurationBuilder()
                         .SetBasePath(environment.ContentRootPath)
                         .AddJsonFile("appSettings.json", optional: true, reloadOnChange: true);
@@ -36,11 +33,15 @@ namespace NCQRSTest
                 .AddOptions()
                 .Configure<Config>(Configuration)
                 .AddTransient<DbContext>()
-                .AddMvc()
-                .AddPugzor();
+                .AddMvc(opts => opts.Filters.Add<CommonViewDataValues>())
+                .AddPugzor(opts =>
+                {
+                    opts.BaseDir = Path.Combine(Environment.ContentRootPath, "Views");
+                    opts.Pretty = Environment.IsDevelopment();
+                });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
 
@@ -51,11 +52,6 @@ namespace NCQRSTest
             app.UseStaticFiles();
 
             app.UseMvc(routes => routes.MapRoute("default", "{Controller}/{Action}"));
-
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
         }
     }
 }

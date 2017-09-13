@@ -1,0 +1,18 @@
+﻿include helpers
+
+doctype html
+html
+head
+    meta(charset="utf-8")
+    title
+    head
+        +css("~/css/bootstrap.min.css")
+    body
+    .container
+        block body
+    
+    input#wwwRoot(type="hidden" value=url('~/js'))
+    +js("~/js/require.min.js")
+    +js("~/js/app/config.js")
+    block scripts
+    

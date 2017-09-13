@@ -1,0 +1,8 @@
+﻿extends /Shared/Layout
+
+block body
+    .row(ng-controller="ctrl" data-dep="app/ctrl")
+        .xl-12 Hello World {{1+1}} {{my}}
+
+block scripts
+    +js("~/js/app/ctrl.js")
